@@ -76,9 +76,9 @@ def return_the_usermenu(wrong_guess_counter, letters_already_guessed): #takes in
 
 
 def user_input_check(input_2): # returns true if the input is incorrect, so it raises an error
-    len_check = len(input_2) == 1
-    letter_check_2 = input_2.isalpha()
-    if len_check and letter_check_2:
+    #len_check = len(input_2) == 1
+    #letter_check_2 = input_2.isalpha()
+    if len(input2) == 1 or input_2.isalpha():
         output1 = False
     else:
         output1 = True
