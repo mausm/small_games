@@ -1,10 +1,3 @@
-"""
-Ik moet nog een try except functie invoegen
-zodat de gebruikers alleen losse letters kunnen invoegen
-nu crasht die waarschijnlijk
-"""
-
-
 class wrong_input_value(ValueError): #raises an error if a user inputs something different than a single letter
     pass
 
@@ -58,38 +51,25 @@ def guess_counter(wrong_guess_counter): #should be an integer
 
 def wrong_guess(user_input):
     print("")
-    print("This letter does not occur in the word")
+    print("\n"  "This letter does not occur in the word")
     letters_already_guessed.append(user_input)
     return letters_already_guessed
 
 
 def return_the_usermenu(wrong_guess_counter, letters_already_guessed): #takes in an integer and the list of letters already guessed
-    print("")
-    print("".join(letters_start))
-    current_count = maximum_guess - wrong_guess_counter
-    print("you have {} guesses left".format(current_count))
-    letters_already_guessed_2 = ""
-    letters_already_guessed_2 = "".join(letters_already_guessed)
-    print("letters you already guessed: {}".format(letters_already_guessed_2))
+
+    print("\n", ",".join(letters_start))
+    print("you have {} guesses left".format(maximum_guess - wrong_guess_counter))
+    print("wrong guesses: {}".format("".join(letters_already_guessed)))
     user_input = input("Select a letter to guess: ")
     return user_input
 
 
 def user_input_check(input_2): # returns true if the input is incorrect, so it raises an error
-    #len_check = len(input_2) == 1
-    #letter_check_2 = input_2.isalpha()
-    if len(input2) == 1 or input_2.isalpha():
-        output1 = False
+    if len(input_2) == 1 and input_2.isalpha():
+        return False
     else:
-        output1 = True
-    return output1
-
-#def sanitizing_user_input(user_input):
-#    try:
-#
-#    except:
-#       print("you tried to enter an invalid input")
-
+        return True
 
 while (''.join(letters_start)) != word_to_guess and wrong_guess_counter < maximum_guess:
     try:
@@ -111,5 +91,3 @@ if word_to_guess == "".join(letters_start):
     print("congratulations, you won!")
 else:
     print("sorry, you lost")
-
-#print(''.join(letters_start))
