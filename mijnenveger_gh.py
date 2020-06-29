@@ -1,5 +1,12 @@
 from random import randint
 
+# these numbers can be edited, max is around 700 * 700
+
+LENGTE = 10
+BREEDTE = 10
+MIJNEN = 20
+
+
 class out_of_range(Exception):
     pass
 
@@ -143,13 +150,6 @@ class Punt:
             return "-"
 
 
-# these numbers can be edited, max is around 700 * 700
-
-LENGTE = 10
-BREEDTE = 10
-MIJNEN = 20
-
-
 def create_number_map():
     number_map = []
     for i in range(1, LENGTE + 1):
@@ -185,7 +185,6 @@ Mijnenveger.punten = insert_mines(MIJNEN, Mijnenveger.punten)
 
 insert_mine_numbers(Mijnenveger.punten, Mijnenveger)
 
-#print(Puntlijst)
 
 
 def computer_view():
