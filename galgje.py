@@ -1,3 +1,5 @@
+#my very first small project, would definitely do it differently now
+
 class wrong_input_value(ValueError): #raises an error if a user inputs something different than a single letter
     pass
 
@@ -51,7 +53,7 @@ def guess_counter(wrong_guess_counter): #should be an integer
 
 def wrong_guess(user_input):
     print("")
-    print("\n"  "This letter does not occur in the word")
+    print("\n This letter does not occur in the word")
     letters_already_guessed.append(user_input)
     return letters_already_guessed
 
@@ -87,7 +89,7 @@ while (''.join(letters_start)) != word_to_guess and wrong_guess_counter < maximu
 
 #when you come out of the while loop, you have either won or lost
 if word_to_guess == "".join(letters_start):
-    print("")
-    print("congratulations, you won!")
+    
+    print(" /n Congratulations, you won!")
 else:
-    print("sorry, you lost")
+    print("Sorry, you lost")
