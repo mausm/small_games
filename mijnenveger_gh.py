@@ -1,3 +1,6 @@
+#TODO: change the list of points into a list of rows [[1,2... Y+1], [1,2...Y+1] * X ..] 
+
+
 from random import randint
 
 # these numbers can be edited, max is around 700 * 700
