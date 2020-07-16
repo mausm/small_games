@@ -8,8 +8,8 @@ word_to_guess = input("Enter the word that the other user has to guess: ") #The 
 word_to_guess = word_to_guess.strip().lower() #remove any capitalized letters
 letters_start = list("_" * len(word_to_guess)) #startvalue of letters you know
 
-maximum_guess = 8  # set this to limit the amount of guesses
-wrong_guess_counter = 0
+MAXIMUM_GUESS = 8  # set this to limit the amount of guesses
+WRONG_GUESS_COUNTER = 0
 letters_already_guessed = []
 
 
@@ -44,11 +44,11 @@ def letters_you_know(user_input): #adds the correct guesses to the line with the
     return letters_start
 
 
-def guess_counter(wrong_guess_counter): #should be an integer
-    wrong_guess_counter += 1
-    guesses_left = maximum_guess - wrong_guess_counter
-    print("you have made {} wrong guesses, {} guesses left".format(wrong_guess_counter,guesses_left))
-    return wrong_guess_counter
+def guess_counter(WRONG_GUESS_COUNTER): #should be an integer
+    WRONG_GUESS_COUNTER += 1
+    guesses_left = MAXIMUM_GUESS - WRONG_GUESS_COUNTER
+    print("you have made {} wrong guesses, {} guesses left".format(WRONG_GUESS_COUNTER,guesses_left))
+    return WRONG_GUESS_COUNTER
 
 
 def wrong_guess(user_input):
@@ -58,10 +58,10 @@ def wrong_guess(user_input):
     return letters_already_guessed
 
 
-def return_the_usermenu(wrong_guess_counter, letters_already_guessed): #takes in an integer and the list of letters already guessed
+def return_the_usermenu(WRONG_GUESS_COUNTER, letters_already_guessed): #takes in an integer and the list of letters already guessed
 
     print("\n", ",".join(letters_start))
-    print("you have {} guesses left".format(maximum_guess - wrong_guess_counter))
+    print("you have {} guesses left".format(MAXIMUM_GUESS - WRONG_GUESS_COUNTER))
     print("wrong guesses: {}".format("".join(letters_already_guessed)))
     user_input = input("Select a letter to guess: ")
     return user_input
@@ -73,16 +73,16 @@ def user_input_check(input_2): # returns true if the input is incorrect, so it r
     else:
         return True
 
-while (''.join(letters_start)) != word_to_guess and wrong_guess_counter < maximum_guess:
+while (''.join(letters_start)) != word_to_guess and WRONG_GUESS_COUNTER < MAXIMUM_GUESS:
     try:
-        input_var = return_the_usermenu(wrong_guess_counter, letters_already_guessed)
+        input_var = return_the_usermenu(WRONG_GUESS_COUNTER, letters_already_guessed)
         if user_input_check(input_var):
             raise wrong_input_value("You gave an incorrect input, please try again")
         elif letter_check(input_var):
             letters_start = letters_you_know(input_var)
         else:
             letters_already_guessed = wrong_guess(input_var)
-            wrong_guess_counter = guess_counter(wrong_guess_counter)
+            WRONG_GUESS_COUNTER = guess_counter(WRONG_GUESS_COUNTER)
     except wrong_input_value:
         print("You have given an incorrect input, please try again")
         continue
