@@ -1,34 +1,30 @@
 #my very first small project, would definitely do it differently now
 
-class wrong_input_value(ValueError): #raises an error if a user inputs something different than a single letter
+class Wrong_input_value(ValueError): #raises an error if a user inputs something different than a single letter
     pass
 
 
-word_to_guess = input("Enter the word that the other user has to guess: ") #The word that the other has to guess
+while True:
+    word_to_guess = input("Enter the word that the other user has to guess: ") #The word that the other has to guess
+    if word_to_guess.isalpha():
+        break
+    else:
+        print("Please use valid characters only")
+
 word_to_guess = word_to_guess.strip().lower() #remove any capitalized letters
 letters_start = list("_" * len(word_to_guess)) #startvalue of letters you know
 
 MAXIMUM_GUESS = 8  # set this to limit the amount of guesses
-WRONG_GUESS_COUNTER = 0
+wrong_guess_counter = 0
 letters_already_guessed = []
 
 
-
-def create_a_list_from_guessword(word_to_guess_2):  #makes it easier to take the positionvalues
-    return [item for item in remove_formatting(word_to_guess_2)]
-
-
-def remove_formatting(user_string):  # returns everything to lowercase without spaces
-    user_string_clean = user_string.strip().lower()
-    return user_string_clean
+def create_a_list_from_guessword(word):  #makes it easier to take the positionvalues
+    word = word.strip().lower()
+    return list(word)
 
 
-def letter_check(user_input): #returns true if the user guessed correctly
-    if user_input in create_a_list_from_guessword(word_to_guess):
-        return True
-
-
-def position_check(user_input): #checks in which places the user letter occurs
+def position_check(user_input, word_to_guess): #checks in which places the user letter occurs
     position_answer = []
     pos = 0
     for i in create_a_list_from_guessword(word_to_guess): #uses the global variable word_to_guess
@@ -38,58 +34,47 @@ def position_check(user_input): #checks in which places the user letter occurs
     return position_answer
 
 
-def letters_you_know(user_input): #adds the correct guesses to the line with the "_"s
-    for i in position_check(user_input):
+def letters_you_know(user_input, word_to_guess): #adds the correct guesses to the line with the "_"s
+    for i in position_check(user_input, word_to_guess):
         letters_start[i] = word_to_guess[i]
     return letters_start
 
 
-def guess_counter(WRONG_GUESS_COUNTER): #should be an integer
-    WRONG_GUESS_COUNTER += 1
-    guesses_left = MAXIMUM_GUESS - WRONG_GUESS_COUNTER
-    print("you have made {} wrong guesses, {} guesses left".format(WRONG_GUESS_COUNTER,guesses_left))
-    return WRONG_GUESS_COUNTER
+def guess_counter(wrong_guess_counter): #should be an integer
+    guesses_left = MAXIMUM_GUESS - wrong_guess_counter
+    print("you have made {} wrong guesses, {} guesses left".format(wrong_guess_counter,guesses_left))
 
 
-def wrong_guess(user_input):
-    print("")
-    print("\n This letter does not occur in the word")
-    letters_already_guessed.append(user_input)
-    return letters_already_guessed
-
-
-def return_the_usermenu(WRONG_GUESS_COUNTER, letters_already_guessed): #takes in an integer and the list of letters already guessed
-
+def return_the_usermenu(wrong_guess_counter, letters_already_guessed): #takes in an integer and the list of letters already guessed
     print("\n", ",".join(letters_start))
-    print("you have {} guesses left".format(MAXIMUM_GUESS - WRONG_GUESS_COUNTER))
+    print("you have {} guesses left".format(MAXIMUM_GUESS - wrong_guess_counter))
     print("wrong guesses: {}".format("".join(letters_already_guessed)))
     user_input = input("Select a letter to guess: ")
-    return user_input
+    return user_input.lower()
 
 
-def user_input_check(input_2): # returns true if the input is incorrect, so it raises an error
-    if len(input_2) == 1 and input_2.isalpha():
-        return False
-    else:
-        return True
+def user_input_check(input):
+    return len(input) != 1 or not input.isalpha()
 
-while (''.join(letters_start)) != word_to_guess and WRONG_GUESS_COUNTER < MAXIMUM_GUESS:
+
+while (''.join(letters_start)) != word_to_guess and wrong_guess_counter < MAXIMUM_GUESS:
     try:
-        input_var = return_the_usermenu(WRONG_GUESS_COUNTER, letters_already_guessed)
+        input_var = return_the_usermenu(wrong_guess_counter, letters_already_guessed)
         if user_input_check(input_var):
-            raise wrong_input_value("You gave an incorrect input, please try again")
-        elif letter_check(input_var):
-            letters_start = letters_you_know(input_var)
+            raise Wrong_input_value("You gave an incorrect input, please try again")
+        elif input_var in create_a_list_from_guessword(word_to_guess):
+            letters_start = letters_you_know(input_var, word_to_guess)
         else:
-            letters_already_guessed = wrong_guess(input_var)
-            WRONG_GUESS_COUNTER = guess_counter(WRONG_GUESS_COUNTER)
-    except wrong_input_value:
+            print("\n"  "This letter does not occur in the word")
+            letters_already_guessed.append(input_var)
+            wrong_guess_counter += 1
+            guess_counter(wrong_guess_counter)
+    except Wrong_input_value:
         print("You have given an incorrect input, please try again")
         continue
 
 #when you come out of the while loop, you have either won or lost
 if word_to_guess == "".join(letters_start):
-    
-    print(" /n Congratulations, you won!")
+    print(" \nCongratulations, you won!")
 else:
-    print("Sorry, you lost")
+    print(" \nSorry, you loose :(")
