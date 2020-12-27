@@ -1,5 +1,6 @@
-#TODO: change the list of points into a list of rows [[1,2... Y+1], [1,2...Y+1] * X ..] 
+import numpy as np
 
+# use numpy 2d arrays for speed!
 
 from random import randint
 
@@ -8,6 +9,28 @@ from random import randint
 LENGTE = 10
 BREEDTE = 10
 MIJNEN = 20
+BOMMEN = 10
+
+def random_bin_array(K, N):
+    arr = np.zeros(N)
+    arr[:K] = 1
+    np.random.shuffle(arr)
+    return arr
+
+def create_matrix(array1d, col, row):
+    twod_matrix = np.reshape(array1d, (row, col))
+    return twod_matrix
+
+Veld = Board(LENGTE, BREEDTE)
+Veld.bom = random_bin_array(BOMMEN, LENGTE*BREEDTE)
+
+class Board:
+    def __init__(self, x, y):
+       
+        self.bom = [] # 1: voor bom 0: voor geen 
+        self.bomrondom = [] # hoeveel bommen er naast zijn
+        self.leeg = [] # 1 als er of een bom / bommen rondom  zijn 0 als het helemaal leeg is
+        
 
 
 class out_of_range(Exception):
@@ -159,15 +182,6 @@ def create_number_map():
         for j in range(1, BREEDTE + 1):
             number_map.append(Punt(i, j))
     return number_map
-
-
-def insert_mines(amount_of_mines, Puntlijst):
-    i = 0
-    while i < amount_of_mines:
-        a = randint(1, len(Puntlijst) -1)
-        Puntlijst[a].status = 1
-        i += 1
-    return Puntlijst
 
 
 def insert_mine_numbers(list, main_object):
