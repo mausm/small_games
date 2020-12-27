@@ -28,10 +28,15 @@ class Board:
     def __init__(self, x, y):
        
         self.bom = [] # 1: voor bom 0: voor geen 
-        self.bomrondom = [] # hoeveel bommen er naast zijn
-        self.leeg = [] # 1 als er of een bom / bommen rondom  zijn 0 als het helemaal leeg is
-        
-
+        self.bomrondom = np.empty((x,y) # hoeveel bommen er naast zijn
+        self.leeg = np.empty((x,y)) # 1 als er of een bom / bommen rondom  zijn 0 als het helemaal leeg is
+      
+    def insert_bombs(self, bombs, x, y):
+        random_bin_array(K, x*y
+        arr = np.zeros(x*y 
+        arr[:K] = 1
+        np.random.shuffle(arr)
+        return self.bombs
 
 class out_of_range(Exception):
     pass
