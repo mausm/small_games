@@ -6,6 +6,14 @@ from random import randint
 
 # these numbers can be edited, max is around 700 * 700
 
+#NEW PLAN
+# use the numpy arrays to get the bombs on random locations
+# transform the numpy arrays to 2d matrices
+# use indexing with np.where to count the amount of bombs around a location (check if index is valid/not out of bounds)
+# use the leeg array for all positions which do not have a number or bomb. (so we just need one measure to open all empty fields)
+# use a deque to add all fields around clicked position and add them to deque. 
+# for each field remove the checked field and make leeg pos '1' and add the surrounding empty fields to deque
+
 LENGTE = 10
 BREEDTE = 10
 MIJNEN = 20
