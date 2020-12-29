@@ -22,7 +22,7 @@ def create_matrix(array1d, col, row):
     return twod_matrix
 
 Veld = Board(LENGTE, BREEDTE)
-Veld.bom = random_bin_array(BOMMEN, LENGTE*BREEDTE)
+Veld.insert_bombs(BOMMEN, LENGTE,BREEDTE)
 
 class Board:
     def __init__(self, x, y):
@@ -32,12 +32,18 @@ class Board:
         self.leeg = np.empty((x,y)) # 1 als er of een bom / bommen rondom  zijn 0 als het helemaal leeg is
       
     def insert_bombs(self, bombs, x, y):
-        random_bin_array(K, x*y
+        random_bin_array(bombs, x*y
         arr = np.zeros(x*y 
-        arr[:K] = 1
+        arr[:bombs] = 1
         np.random.shuffle(arr)
         return self.bombs
+                       
+    def transform_matrix(array1d, col, row):
+        twod_matrix = np.reshape(array1d, (row, col))
+        return twod_matrix
 
+                       
+                       
 class out_of_range(Exception):
     pass
 
@@ -199,6 +205,8 @@ def insert_mine_numbers(list, main_object):
 
 
 
+                       
+                       
 Puntlijst = create_number_map() # creates a list of punt objects according to the size of the board
 
 Mijnenveger = Veld(Puntlijst) # you can change this name
