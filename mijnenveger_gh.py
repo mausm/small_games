@@ -1,26 +1,15 @@
-import collections
-
 import numpy as np
 
 # use numpy 2d arrays for speed!
 
-from random import randint
-
-# these numbers can be edited, max is around 700 * 700
 
 # NEW PLAN
-# use the numpy arrays to get the bombs on random locations DONE
-# transform the numpy arrays to 2d matrices DONE
-# use indexing with np.where to count the amount of bombs around a location (check if index is valid/not out of bounds) DONE
-# use the leeg array for all positions which do not have a number or bomb. (so we just need one measure to open all empty fields) DONE
-# use a deque to add all fields around clicked position and add them to deque. -> SET OPERATIONS WORKED BETTER - DONE
-# for each field remove the checked field and make leeg pos '1' and add the surrounding empty fields to deque DONE
-
-LENGTE = 10
-BREEDTE = 10
-MIJNEN = 20
-BOMMEN = 10
-
+# use the numpy arrays to get the bombs on random locations
+# transform the numpy arrays to 2d matrices
+# use indexing with np.where to count the amount of bombs around a location (check if index is valid/not out of bounds)
+# use the leeg array for all positions which do not have a number or bomb. (so we just need one measure to open all empty fields)
+# use a deque to add all fields around clicked position and add them to deque.
+# for each field remove the checked field and make leeg pos '1' and add the surrounding empty fields to deque
 
 def random_bin_array(K, N):
     arr = np.zeros(N)
@@ -41,17 +30,18 @@ class Board:
         self.bomrondom = np.empty((x, y))  # hoeveel bommen er naast zijn
         self.leeg = np.empty((x, y))  # 1 als er of een bom / bommen rondom  zijn 0 als het helemaal leeg is
         self.checked = np.zeros((x,y))
+        self.pcview = np.zeros((x,y))
 
     def insert_bombs(self, bombs, x, y):
         random_bin_array(bombs, x * y)
         arr = np.zeros(x * y)
         arr[:bombs] = 1
         np.random.shuffle(arr)
-        self.bom = self.transform_matrix(self, arr, x, y)
+        self.bom = self.transform_matrix(arr, x, y)
         return self.bom
 
     @staticmethod
-    def transform_matrix(self, array1d, col, row):
+    def transform_matrix(array1d, col, row):
         twod_matrix = np.reshape(array1d, (row, col))
         return twod_matrix
 
@@ -82,13 +72,11 @@ class Board:
 
     def check_surrounding(self, x, y):
         fields_to_check = set()
-        #waiting_list = collections.deque
-        current_check = 0
         fields_to_check.add((x,y))
         self.checked[x, y] = 1
         while True:
             x,y = fields_to_check.pop()
-            if self.leeg[x,y] == 0: #and checked[x,y] == 0:
+            if self.leeg[x,y] == 0:
                 check_list = {(x - 1, y), (x, y - 1), (x, y + 1),  (x + 1, y)}
                 check_list = {pos for pos in check_list if 0 <= pos[0] < self.checked.shape[0] and 0 <= pos[1] < self.checked.shape[1]}
 
@@ -100,16 +88,48 @@ class Board:
             if len(fields_to_check) == 0:
                 break
 
+    def convert_to_pc_view(self):
 
-test = Board(100,100)
-test.insert_bombs(50,100,100)
-test.create_bombmap(test.bom, 10,10)
+        #NOT DONE YET!
+        check_view = self.checked
+        rondom_view = np.where(self.bomrondom > 0, self.bomrondom, 1)
+        combined = np.add(check_view, rondom_view)
+        updown = np.add(combined[1:,:], combined[0:-1,:])
+        leftright =  np.add(combined[1:,:], combined[0:-1,:])
+        np.stack(updown[0,:], updown)
+        np.stack(leftright[:,0], leftright)
+        
 
+
+
+"""
+test = Board(1000,1000)
+test.insert_bombs(500,1000,1000)
+test.create_bombmap(test.bom, 1000,1000)
 test.create_leegmap(test.bom, test.bomrondom)
-
 test.check_surrounding(2,2)
+"""
 
-print(test.bom, "\n")
-print(test.leeg, "\n")
-print(test.bomrondom, "\n")
-print(test.checked)
+x,y = 10,10
+bombs = 20
+
+while True:
+    try:
+        print("let's set up the board!")
+        x = int(input("Please select the amount of rows: "))
+        y = int(input("Please select the amount of columns: "))
+        bombs = int(input("Please select the amount of columns: "))
+    except ValueError:
+        if input("if you want to exit, press q or else try again: use only numbers") == 'q':
+            break
+
+print("setting up board")
+bord = Board(x,y)
+print("Inserting mines")
+bord.insert_bombs(bombs, x,y)
+print("Finalizing the set-up")
+bord.create_bombmap(bord.bom, x, y)
+bord.create_leegmap(bord.bom, bord.bomrondom)
+
+while True:
+    print()
