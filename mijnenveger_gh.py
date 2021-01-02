@@ -2,7 +2,6 @@ import numpy as np
 
 # use numpy 2d arrays for speed!
 
-
 # NEW PLAN
 # use the numpy arrays to get the bombs on random locations
 # transform the numpy arrays to 2d matrices
@@ -46,7 +45,7 @@ class Board:
         return twod_matrix
 
 
-    def create_bombmap(self, bom, x, y):
+    def create_bombmap_old(self, bom, x, y):
         for i in range(bom.shape[0]):
             for j in range(bom.shape[1]):
                 check_list = [[i-1,j-1], [i-1,j],[i-1,j+1],[i,j-1],[i, j+1], [i+1,j-1], [i+1,j],[i+1,j+1]]
@@ -60,14 +59,28 @@ class Board:
                 else:
                     self.bomrondom[i,j] = 0
 
+    def create_bombmap(self, bom):
+        x,y = bom.shape[0], bom.shape[1]
+        bommap = np.zeros((x,y))
+        bommap = bommap + np.vstack((bom[1:,:], np.zeros(x))) + np.vstack((np.zeros(x),bom[:-1,:]))
+        #up= bom[1:,:] #down = bom[:-1,:] #left = bom[:,1:] #right = bom[:,:-1]
+        bommap = bommap +  np.hstack((bom[:,1:], np.zeros((y,1)))) + np.hstack((np.zeros((y,1)), bom[:,:-1]))
+        # rightup = bom[1:,:-1] # rightdown = bom[:-1,:-1]
+        tempdiag = np.pad(bom[1:,:-1], ((0,1),(1,0)), 'constant' ) + np.pad(bom[:-1,1:], ((1,0),(0,1)), 'constant' )
+        tempdiag2 = np.pad(bom[1:,1:], ((0,1),(0,1)), 'constant' ) + np.pad(bom[:-1,:-1], ((1,0),(1,0)), 'constant' )
+        self.bomrondom2 = tempdiag + tempdiag2 + bommap
 
     def create_leegmap(self, bom, bommap):
+        """
         for i in range(bommap.shape[0]):
             for j in range(bommap.shape[1]):
                 if bom[i,j] == 1 or bommap[i,j] > 0:
                     self.leeg[i,j] = 1
                 else:
                     self.leeg[i,j] = 0
+        """
+        # quick numpy way:
+        self.leeg = np.where(bom + bommap == 0, 0, 1)
 
 
     def check_surrounding(self, x, y):
@@ -98,17 +111,23 @@ class Board:
         leftright =  np.add(combined[1:,:], combined[0:-1,:])
         np.stack(updown[0,:], updown)
         np.stack(leftright[:,0], leftright)
-        
 
 
 
-"""
-test = Board(1000,1000)
-test.insert_bombs(500,1000,1000)
-test.create_bombmap(test.bom, 1000,1000)
+
+a, b = 10,10
+test = Board(a,b)
+print("board set up")
+test.insert_bombs(10,a,b)
+print("bombs inserted")
+test.create_bombmap(test.bom)
+print(test.bomrondom2)
+print("bommen rondom created")
 test.create_leegmap(test.bom, test.bomrondom)
+print("empty map created")
 test.check_surrounding(2,2)
-"""
+print(test.checked)
+
 
 x,y = 10,10
 bombs = 20
@@ -128,8 +147,6 @@ bord = Board(x,y)
 print("Inserting mines")
 bord.insert_bombs(bombs, x,y)
 print("Finalizing the set-up")
-bord.create_bombmap(bord.bom, x, y)
+bord.create_bombmap(bord.bom)
 bord.create_leegmap(bord.bom, bord.bomrondom)
 
-while True:
-    print()
