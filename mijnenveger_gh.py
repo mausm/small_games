@@ -2,6 +2,8 @@ import sys
 
 import numpy as np
 
+# use numpy 2d arrays for speed!
+
 def random_bin_array(K, N):
     arr = np.zeros(N)
     arr[:K] = 1
@@ -130,72 +132,78 @@ class Board:
                 break
 
     def convert_to_pc_view(self):
-
-        #NOT DONE YET!
-        check_view = self.checked
-        rondom_view = np.where(self.bomrondom > 0, self.bomrondom, 1)
-        combined = np.add(check_view, rondom_view)
-        updown = np.add(combined[1:,:], combined[0:-1,:])
-        leftright =  np.add(combined[1:,:], combined[0:-1,:])
-        np.stack(updown[0,:], updown)
-        np.stack(leftright[:,0], leftright)
+        "make it nice"
+        # NOT DONE YET, but not necessary 
+        # could add !
 
 
-# Base values in case something goes wrong with the user input
-row,col = 10,10
-bombs = 20
-
-while True:
-    try:
-        print("let's set up the board!")
-        row = int(input("Please select the amount of rows: "))
-        col = int(input("Please select the amount of columns: "))
-        bombs = int(input("Please select the amount of bombs: "))
-    except ValueError:
-        if input("if you want to exit, press q or else try again: only use numbers") == 'q':
-            break
-    break
-
-bord = Board(row, col)
-bord.insert_bombs(bombs, row,col)
-bord.create_bombmap(bord.bom)
-bord.create_leegmap(bord.bom, bord.bomrondom)
-print("Let's start")
+print(test.checked)
 
 
-user_input = get_xy_user(row,col)
-if user_input == "quit":
-    sys.exit()
-else:
-    x = user_input[0]
-    y = user_input[1]
-bord.check_surrounding(x,y)
 
-while True:
+def main():
+    # Base values in case something goes wrong with the user input
+    row, col = 10, 10
+    bombs = 20
 
-    user_input = get_xy_user(x, y)
-    if user_input == "quit":
+
+    while True:
+        try:
+            print("let's set up the board!")
+            row = int(input("Please select the amount of rows: "))
+            col = int(input("Please select the amount of columns: "))
+            bombs = int(input("Please select the amount of bombs: "))
+        except ValueError:
+            if input("if you want to exit, press q or else try again: only use numbers") == 'q':
+                break
+        # remove edge-cases minimum board is 5x5
+        row = min(abs(row), 5)
+        col = min(abs(col), 5)
+        if bombs > row * col:
+            bombs = row * col
         break
+
+
+    bord = Board(row, col)
+    bord.insert_bombs(bombs, row,col)
+    bord.create_bombmap(bord.bom)
+    bord.create_leegmap(bord.bom, bord.bomrondom)
+    print("Let's start")
+
+
+    user_input = get_xy_user(row,col)
+    if user_input == "quit":
+        sys.exit()
     else:
-        x = user_input[0]
-        y = user_input[1]
-
-    if bord.bom[x,y] == 1:
-        print(bord.bom)
-        if input("Helaas, je hebt een bom geraakt, opnieuw proberen druk 'r'") == "r":
-            bord = bord(row,col)
-        else:
-            break
-
+        x = user_input[0] - 1
+        y = user_input[1] - 1
     bord.check_surrounding(x,y)
-    print(bord.checked)
 
-    if np.sum(bord.checked) == row * col - bombs:
-        print("You have won!!")
-                if input("play again? press 'a': ") == "a":
-            bord = bord(row,col)
-        else:
+    while True:
+
+        user_input = get_xy_user(x, y)
+        if user_input == "quit":
             break
-            
+        else:
+            x = user_input[0]
+            y = user_input[1]
+
+        if bord.bom[x,y] == 1:
+            print("Helaas, je hebt een bom geraakt...")
+            print(bord.bom)
 
 
+        bord.check_surrounding(x,y)
+        print(bord.checked)
+
+        if np.sum(bord.checked) == row * col - bombs:
+            print("You have won!!")
+            break
+
+
+if input("play again? press 'a': ") == "a":
+    main()
+
+
+if __name__ == '__main__':
+    main()
