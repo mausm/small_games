@@ -1,14 +1,6 @@
+import sys
+
 import numpy as np
-
-# use numpy 2d arrays for speed!
-
-# NEW PLAN
-# use the numpy arrays to get the bombs on random locations
-# transform the numpy arrays to 2d matrices
-# use indexing with np.where to count the amount of bombs around a location (check if index is valid/not out of bounds)
-# use the leeg array for all positions which do not have a number or bomb. (so we just need one measure to open all empty fields)
-# use a deque to add all fields around clicked position and add them to deque.
-# for each field remove the checked field and make leeg pos '1' and add the surrounding empty fields to deque
 
 def random_bin_array(K, N):
     arr = np.zeros(N)
@@ -21,6 +13,18 @@ def create_matrix(array1d, col, row):
     twod_matrix = np.reshape(array1d, (row, col))
     return twod_matrix
 
+def get_xy_user(rmax,ymax):
+    while True:
+        xy_val = input("Please given an column and a row value separated with a comma like: x,y ")
+        xy_val = xy_val.split(",")
+        try:
+            if 0 > int(xy_val[0]) > rmax or 0 > int(xy_val[1]) > ymax:
+                continue
+            xy_val = [int(xy_val[0]), int(xy_val[1])]
+            return xy_val
+        except (ValueError, IndexError):
+            if input("please try again, or press q to quit") == "q":
+                return "quit"
 
 
 class Board:
@@ -60,6 +64,13 @@ class Board:
                     self.bomrondom[i,j] = 0
 
     def create_bombmap(self, bom):
+        # with some simple matrix adding up we can create the totals for all 8 directions.
+        # example for the neighbors on te left, all cases with 2 have a neighbor left
+        # 0101 =>  00101 + 01010 = 01111
+        # 1100 =>  01100 + 11000 = 12100
+        # 0011 =>  00011 + 00110 = 00121
+        # 1010 =>  01010 + 10100 = 11110
+        # this works extremely fast for larger boards!
         x,y = bom.shape[0], bom.shape[1]
         bommap = np.zeros((x,y))
         bommap = bommap + np.vstack((bom[1:,:], np.zeros(x))) + np.vstack((np.zeros(x),bom[:-1,:]))
@@ -68,7 +79,7 @@ class Board:
         # rightup = bom[1:,:-1] # rightdown = bom[:-1,:-1]
         tempdiag = np.pad(bom[1:,:-1], ((0,1),(1,0)), 'constant' ) + np.pad(bom[:-1,1:], ((1,0),(0,1)), 'constant' )
         tempdiag2 = np.pad(bom[1:,1:], ((0,1),(0,1)), 'constant' ) + np.pad(bom[:-1,:-1], ((1,0),(1,0)), 'constant' )
-        self.bomrondom2 = tempdiag + tempdiag2 + bommap
+        self.bomrondom = tempdiag + tempdiag2 + bommap
 
     def create_leegmap(self, bom, bommap):
         """
@@ -99,6 +110,23 @@ class Board:
                     self.checked[positions] = 1
 
             if len(fields_to_check) == 0:
+                #adds all the diagonal fields where a checked field is next to it.
+                # for each field which is unchecked, but is diagional to a checked empty field it should add it to checked
+
+                checkmap = np.where(self.bomrondom == 0, 1, 0) * self.checked
+                checkmap = np.logical_not(self.bom) * checkmap
+
+                #checkmap = np.vstack((self.checked[1:, :], np.zeros(self.checked.shape[0]))) + np.vstack((np.zeros(self.checked.shape[0]), self.checked[:-1, :]))
+                # = checkmap + np.hstack((self.checked[:, 1:], np.zeros((self.checked.shape[1], 1)))) + np.hstack((np.zeros((self.checked.shape[1], 1)), self.checked[:, :-1]))
+                tempdiag = np.pad(checkmap[1:, :-1], ((0, 1), (1, 0)), 'constant') + np.pad(checkmap[:-1, 1:], ((1, 0), (0, 1)),
+                                                                                       'constant')
+                tempdiag = tempdiag + np.pad(checkmap[1:, 1:], ((0, 1), (0, 1)), 'constant') + np.pad(checkmap[:-1, :-1], ((1, 0), (1, 0)),
+                                                                                       'constant')
+
+
+                checked = (tempdiag == 1) * np.where(self.bom == 0, 1,0) * (self.checked == 0)
+                self.checked = self.checked - checked + self.checked
+
                 break
 
     def convert_to_pc_view(self):
@@ -113,40 +141,61 @@ class Board:
         np.stack(leftright[:,0], leftright)
 
 
-
-
-a, b = 10,10
-test = Board(a,b)
-print("board set up")
-test.insert_bombs(10,a,b)
-print("bombs inserted")
-test.create_bombmap(test.bom)
-print(test.bomrondom2)
-print("bommen rondom created")
-test.create_leegmap(test.bom, test.bomrondom)
-print("empty map created")
-test.check_surrounding(2,2)
-print(test.checked)
-
-
-x,y = 10,10
+# Base values in case something goes wrong with the user input
+row,col = 10,10
 bombs = 20
 
 while True:
     try:
         print("let's set up the board!")
-        x = int(input("Please select the amount of rows: "))
-        y = int(input("Please select the amount of columns: "))
-        bombs = int(input("Please select the amount of columns: "))
+        row = int(input("Please select the amount of rows: "))
+        col = int(input("Please select the amount of columns: "))
+        bombs = int(input("Please select the amount of bombs: "))
     except ValueError:
-        if input("if you want to exit, press q or else try again: use only numbers") == 'q':
+        if input("if you want to exit, press q or else try again: only use numbers") == 'q':
             break
+    break
 
-print("setting up board")
-bord = Board(x,y)
-print("Inserting mines")
-bord.insert_bombs(bombs, x,y)
-print("Finalizing the set-up")
+bord = Board(row, col)
+bord.insert_bombs(bombs, row,col)
 bord.create_bombmap(bord.bom)
 bord.create_leegmap(bord.bom, bord.bomrondom)
+print("Let's start")
+
+
+user_input = get_xy_user(row,col)
+if user_input == "quit":
+    sys.exit()
+else:
+    x = user_input[0]
+    y = user_input[1]
+bord.check_surrounding(x,y)
+
+while True:
+
+    user_input = get_xy_user(x, y)
+    if user_input == "quit":
+        break
+    else:
+        x = user_input[0]
+        y = user_input[1]
+
+    if bord.bom[x,y] == 1:
+        print(bord.bom)
+        if input("Helaas, je hebt een bom geraakt, opnieuw proberen druk 'r'") == "r":
+            bord = bord(row,col)
+        else:
+            break
+
+    bord.check_surrounding(x,y)
+    print(bord.checked)
+
+    if np.sum(bord.checked) == row * col:
+        print("You have won!!")
+                if input("play again? press 'a': ") == "a":
+            bord = bord(row,col)
+        else:
+            break
+            
+
 
