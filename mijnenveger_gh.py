@@ -190,7 +190,7 @@ while True:
     bord.check_surrounding(x,y)
     print(bord.checked)
 
-    if np.sum(bord.checked) == row * col:
+    if np.sum(bord.checked) == row * col - bombs:
         print("You have won!!")
                 if input("play again? press 'a': ") == "a":
             bord = bord(row,col)
